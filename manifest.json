@@ -1,0 +1,10 @@
+{
+  "name": "福社推介礼 · 之初遇成章",
+  "short_name": "福社推介礼",
+  "start_url": "./",
+  "scope": "./",
+  "display": "fullscreen",
+  "orientation": "portrait",
+  "background_color": "#fff7fa",
+  "theme_color": "#ffd6e5"
+}
