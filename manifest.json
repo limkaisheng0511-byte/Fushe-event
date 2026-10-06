@@ -1,10 +1,23 @@
 {
   "name": "福社推介礼 · 之初遇成章",
   "short_name": "福社推介礼",
+  "description": "福社推介礼 · 之初遇成章",
   "start_url": "./",
   "scope": "./",
   "display": "fullscreen",
   "orientation": "portrait",
   "background_color": "#fff7fa",
-  "theme_color": "#ffd6e5"
+  "theme_color": "#ffd6e5",
+  "icons": [
+    {
+      "src": "./icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "./icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
 }
