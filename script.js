@@ -1,176 +1,81 @@
-const startButton =
-  document.getElementById("startButton");
-
-const installButton =
-  document.getElementById("installButton");
-
-const openingScreen =
-  document.querySelector(".opening-screen");
-
-const startScreen =
-  document.querySelector(".start-screen");
-
-const openLetterButton =
-  document.querySelector(".open-letter");
-
-const messageScreen =
-  document.querySelector(".message-screen");
-
-const envelope =
-  document.querySelector(".envelope");
-
-
-/* =========================
-   PWA 安装
-========================= */
-
-let deferredPrompt = null;
-
-
-/*
-  Chrome 判断网站符合安装条件后，
-  会触发这个事件。
-*/
-
-window.addEventListener(
-  "beforeinstallprompt",
-  (event) => {
-
-    // 阻止 Chrome 自动处理
-    event.preventDefault();
-
-    // 暂存安装提示
-    deferredPrompt = event;
-
-    // 显示安装按钮
-    installButton.hidden = false;
-
-  }
-);
-
-
-/*
-  点击「安装福社推介礼」
-*/
-
-installButton.addEventListener(
-  "click",
-  async () => {
-
-    if (!deferredPrompt) {
-      return;
-    }
-
-    // 显示系统安装窗口
-    deferredPrompt.prompt();
-
-    // 等待用户选择
-    const result =
-      await deferredPrompt.userChoice;
-
-    console.log(
-      "PWA install result:",
-      result.outcome
-    );
-
-    // 安装提示只能使用一次
-    deferredPrompt = null;
-
-    // 隐藏按钮
-    installButton.hidden = true;
-
-  }
-);
-
-
-/*
-  如果已经安装成功，
-  就把安装按钮隐藏。
-*/
-
-window.addEventListener(
-  "appinstalled",
-  () => {
-
-    installButton.hidden = true;
-
-    deferredPrompt = null;
-
-    console.log(
-      "福社推介礼已经安装"
-    );
-
-  }
-);
-
-
-/* =========================
-   音乐
-========================= */
+const startButton = document.getElementById("startButton");
+const openingScreen = document.querySelector(".opening-screen");
+const startScreen = document.querySelector(".start-screen");
+const openLetterButton = document.querySelector(".open-letter");
+const messageScreen = document.querySelector(".message-screen");
+const envelope = document.querySelector(".envelope");
 
 let audioContext = null;
 let masterGain = null;
 let musicStarted = false;
 
 
-function initAudio() {
+/* =========================
+   全屏功能
+========================= */
 
-  if (audioContext) {
-
-    if (
-      audioContext.state ===
-      "suspended"
-    ) {
-      audioContext.resume();
+async function enterFullscreen() {
+  try {
+    if (!document.fullscreenElement) {
+      await document.documentElement.requestFullscreen();
     }
-
-    return;
+  } catch (error) {
+    console.log("Fullscreen unavailable:", error);
   }
-
-  audioContext =
-    new (
-      window.AudioContext ||
-      window.webkitAudioContext
-    )();
-
-  masterGain =
-    audioContext.createGain();
-
-  masterGain.gain.value = 0.045;
-
-  masterGain.connect(
-    audioContext.destination
-  );
 }
 
 
-function playNote(
-  frequency,
-  duration = 1.2,
-  delay = 0
-) {
+/* =========================
+   防止页面滚动
+========================= */
 
-  if (
-    !audioContext ||
-    !masterGain
-  ) {
+document.addEventListener("touchmove", (event) => {
+  event.preventDefault();
+}, { passive: false });
+
+
+document.addEventListener("gesturestart", (event) => {
+  event.preventDefault();
+});
+
+
+/* =========================
+   音乐系统
+========================= */
+
+function initAudio() {
+  if (audioContext) {
+    if (audioContext.state === "suspended") {
+      audioContext.resume();
+    }
     return;
   }
 
-  const oscillator =
-    audioContext.createOscillator();
+  audioContext = new (
+    window.AudioContext ||
+    window.webkitAudioContext
+  )();
 
-  const gain =
-    audioContext.createGain();
+  masterGain = audioContext.createGain();
+
+  masterGain.gain.value = 0.045;
+
+  masterGain.connect(audioContext.destination);
+}
+
+
+function playNote(frequency, duration = 1.2, delay = 0) {
+
+  if (!audioContext || !masterGain) return;
+
+  const oscillator = audioContext.createOscillator();
+  const gain = audioContext.createGain();
 
   oscillator.type = "sine";
-
-  oscillator.frequency.value =
-    frequency;
+  oscillator.frequency.value = frequency;
 
   const startTime =
-    audioContext.currentTime +
-    delay;
+    audioContext.currentTime + delay;
 
   gain.gain.setValueAtTime(
     0.0001,
@@ -188,128 +93,95 @@ function playNote(
   );
 
   oscillator.connect(gain);
-
   gain.connect(masterGain);
 
   oscillator.start(startTime);
 
   oscillator.stop(
-    startTime +
-    duration +
-    0.05
+    startTime + duration + 0.05
   );
 }
 
 
+/* =========================
+   开场音乐
+========================= */
+
 function startMusicBox() {
 
-  if (musicStarted) {
-    return;
-  }
+  if (musicStarted) return;
 
   musicStarted = true;
 
   initAudio();
 
   const melody = [
-
     523.25,
     659.25,
     783.99,
     659.25,
-
     587.33,
     698.46,
     880.00,
     698.46,
-
     523.25,
     659.25,
     783.99,
     1046.50
-
   ];
 
-  melody.forEach(
-    (frequency, index) => {
+  melody.forEach((frequency, index) => {
 
-      playNote(
-        frequency,
-        1.4,
-        index * 0.65
-      );
+    playNote(
+      frequency,
+      1.4,
+      index * 0.65
+    );
 
-    }
-  );
+  });
 
 
   setTimeout(() => {
 
-    melody.forEach(
-      (frequency, index) => {
+    melody.forEach((frequency, index) => {
 
-        playNote(
-          frequency / 2,
-          1.8,
-          index * 0.72
-        );
+      playNote(
+        frequency / 2,
+        1.8,
+        index * 0.72
+      );
 
-      }
-    );
+    });
 
   }, 7800);
 }
 
 
+/* =========================
+   开幕音效
+========================= */
+
 function playOpeningChime() {
 
-  if (!audioContext) {
-    return;
-  }
+  if (!audioContext) return;
 
-  playNote(
-    1046.50,
-    1.2,
-    0
-  );
-
-  playNote(
-    1318.51,
-    1.4,
-    0.12
-  );
-
-  playNote(
-    1567.98,
-    1.6,
-    0.25
-  );
+  playNote(1046.50, 1.2, 0);
+  playNote(1318.51, 1.4, 0.12);
+  playNote(1567.98, 1.6, 0.25);
 }
 
 
+/* =========================
+   信封音效
+========================= */
+
 function playEnvelopeChime() {
 
-  if (!audioContext) {
-    return;
-  }
+  if (!audioContext) return;
 
-  playNote(
-    783.99,
-    0.8,
-    0
-  );
-
-  playNote(
-    1046.50,
-    1.0,
-    0.12
-  );
-
-  playNote(
-    1318.51,
-    1.2,
-    0.25
-  );
+  playNote(783.99, 0.8, 0);
+  playNote(1046.50, 1.0, 0.12);
+  playNote(1318.51, 1.2, 0.25);
 }
 
 
@@ -317,30 +189,30 @@ function playEnvelopeChime() {
    START
 ========================= */
 
-startButton.addEventListener(
-  "click",
-  () => {
+startButton.addEventListener("click", async () => {
 
-    startMusicBox();
+  // 第一时间进入全屏
+  await enterFullscreen();
 
-    playOpeningChime();
+  // 启动音乐
+  startMusicBox();
 
-    startScreen.classList.add(
-      "hide"
-    );
+  // 开幕音效
+  playOpeningChime();
 
-    setTimeout(() => {
+  // 隐藏 START 页面
+  startScreen.classList.add("hide");
 
-      openingScreen.classList.add(
-        "active"
-      );
+  // 稍微等待后出现开幕舞台
+  setTimeout(() => {
 
-      createFloatingDecorations();
+    openingScreen.classList.add("active");
 
-    }, 450);
+    createFloatingDecorations();
 
-  }
-);
+  }, 450);
+
+});
 
 
 /* =========================
@@ -350,7 +222,6 @@ startButton.addEventListener(
 function createFloatingDecorations() {
 
   const symbols = [
-
     "♡",
     "✦",
     "✧",
@@ -363,62 +234,48 @@ function createFloatingDecorations() {
     "💗",
     "🌷",
     "✧"
-
   ];
 
 
-  symbols.forEach(
-    (symbol, index) => {
+  symbols.forEach((symbol, index) => {
 
-      const item =
-        document.createElement(
-          "div"
-        );
+    const item =
+      document.createElement("div");
 
-      item.className =
-        "floating-decoration";
+    item.className =
+      "floating-decoration";
 
-      item.textContent =
-        symbol;
+    item.textContent =
+      symbol;
 
-      item.style.left =
-        Math.random() * 100 + "%";
+    item.style.left =
+      Math.random() * 100 + "%";
 
-      item.style.top =
-        70 +
-        Math.random() * 25 +
-        "%";
+    item.style.top =
+      70 + Math.random() * 25 + "%";
 
-      item.style.fontSize =
-        18 +
-        Math.random() * 24 +
-        "px";
+    item.style.fontSize =
+      18 + Math.random() * 24 + "px";
 
-      item.style.animationDelay =
-        2 +
-        index * 0.18 +
-        "s";
+    item.style.animationDelay =
+      2 + index * 0.18 + "s";
 
-      openingScreen.appendChild(
-        item
-      );
+    openingScreen.appendChild(item);
 
-    }
-  );
+  });
+
 }
 
 
 /* =========================
-   打开正式信
+   打开正式开幕信
 ========================= */
 
 openLetterButton.addEventListener(
   "click",
   () => {
 
-    messageScreen.classList.add(
-      "show"
-    );
+    messageScreen.classList.add("show");
 
   }
 );
@@ -433,18 +290,14 @@ envelope.addEventListener(
   () => {
 
     if (
-      envelope.classList.contains(
-        "open"
-      )
+      envelope.classList.contains("open")
     ) {
       return;
     }
 
     playEnvelopeChime();
 
-    envelope.classList.add(
-      "open"
-    );
+    envelope.classList.add("open");
 
   }
 );
