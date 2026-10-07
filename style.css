@@ -1000,3 +1000,100 @@ button {
   }
 
 }
+/* =================================
+   活动现场全屏模式
+================================= */
+
+html,
+body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+
+    overflow: hidden;
+
+    overscroll-behavior: none;
+
+    touch-action: manipulation;
+
+    -webkit-user-select: none;
+    user-select: none;
+
+    -webkit-touch-callout: none;
+}
+
+
+/* MagicPad 3 竖屏 */
+
+body {
+    min-height: 100vh;
+    min-height: 100dvh;
+
+    width: 100vw;
+
+    overflow: hidden;
+}
+
+
+/* 防止双击放大 */
+
+button,
+.envelope {
+    touch-action: manipulation;
+}
+
+
+/* 全屏时保持整个舞台 */
+
+:fullscreen {
+    width: 100vw;
+    height: 100vh;
+    background: #fff7fa;
+}
+
+
+/* Android / Chrome 全屏 */
+
+:-webkit-full-screen {
+    width: 100vw;
+    height: 100vh;
+    background: #fff7fa;
+}
+
+
+/* =================================
+   防止横屏
+================================= */
+
+@media screen and (orientation: landscape) {
+
+    body::before {
+        content: "请将平板旋转为竖屏 📱";
+
+        position: fixed;
+
+        inset: 0;
+
+        z-index: 99999;
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        text-align: center;
+
+        padding: 30px;
+
+        background: #fff7fa;
+
+        color: #d86b91;
+
+        font-size: 22px;
+
+        font-weight: 600;
+    }
+
+}
