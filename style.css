@@ -1097,3 +1097,95 @@ button,
     }
 
 }
+/* =================================
+   信封待机动画
+================================= */
+
+.envelope {
+    animation: envelopeIdle 3.2s ease-in-out infinite;
+    transform-origin: center center;
+}
+
+
+/* 轻轻漂浮 + 摇摆 */
+
+@keyframes envelopeIdle {
+
+    0% {
+        transform: translateY(0) rotate(0deg);
+    }
+
+    25% {
+        transform: translateY(-7px) rotate(-1deg);
+    }
+
+    50% {
+        transform: translateY(-2px) rotate(1deg);
+    }
+
+    75% {
+        transform: translateY(-8px) rotate(-0.8deg);
+    }
+
+    100% {
+        transform: translateY(0) rotate(0deg);
+    }
+
+}
+
+
+/* =================================
+   打开后停止待机动画
+================================= */
+
+.envelope.open {
+    animation: none;
+}
+
+
+/* =================================
+   信封上的爱心轻轻跳动
+================================= */
+
+.envelope-stamp {
+    animation: stampHeartbeat 1.8s ease-in-out infinite;
+}
+
+
+@keyframes stampHeartbeat {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.12);
+    }
+
+}
+
+
+/* =================================
+   点击提示呼吸效果
+================================= */
+
+.envelope-hint {
+    animation: hintBreathing 2s ease-in-out infinite;
+}
+
+
+@keyframes hintBreathing {
+
+    0%,
+    100% {
+        opacity: 0.65;
+        transform: translateY(0);
+    }
+
+    50% {
+        opacity: 1;
+        transform: translateY(-3px);
+    }
+
+}
